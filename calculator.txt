@@ -1,0 +1,172 @@
+/ get menu input
+Menu, INPUT
+Store MenuChoice
+
+/ check 'a' for addition
+Load MenuChoice
+Subt A
+Skipcond 400
+Jump NotA
+Jump AddFunc
+
+/ check 's' for subtraction
+NotA, Load MenuChoice
+Subt S
+Skipcond 400
+Jump NotS
+Jump SubtractFunc
+
+/ check 'm' for multiplication
+NotS, Load MenuChoice
+Subt M
+Skipcond 400
+Jump NotM
+Jump MultiplyFunc
+
+/ check 'd' for division
+NotM, Load MenuChoice
+Subt D
+Skipcond 400
+Jump NotD
+Jump DivideFunc
+
+/ check 'p' for power/exponent
+NotD, Load MenuChoice
+Subt S
+Skipcond 400
+Jump NotP
+Jump PowerFunc
+
+NotP, halt
+
+/ put math code here
+AddFunc, INPUT
+         Store InputX
+         INPUT
+         Store InputY
+         / add
+         Load InputX
+         Add InputY
+         Output
+         Jump Menu
+SubtractFunc, INPUT
+              Store InputX
+              INPUT
+              Store InputY
+              / subtract
+              Load InputX
+              Subt InputY
+              Output
+              Jump Menu
+/ multiply for menu              
+MultiplyFunc, INPUT
+              Store InputX
+              Input
+              Store InputY
+              JnS MultiplyNumbers
+              Load Result
+              Output
+              Jump Menu
+DivideFunc, INPUT
+            Store InputX
+            Input
+            Store InputY
+            JnS DivideNumbers
+            Load Result
+            Output
+            Jump Menu
+PowerFunc,halt
+/ multiplication subroutine
+MultiplyNumbers, DEC 0
+                 CLEAR
+                 Store Result
+                 Load InputY
+                 Skipcond 000
+                 Jump MultiplyYNonNeg
+
+                 Subt InputY
+                 Subt InputY
+                 Store InputY
+                 Clear
+                 Add One
+                 Store negflag
+                 Clear
+                 Jump loop
+
+MultiplyYNonNeg,  Clear
+                  Store negflag
+loop, Load Result
+                  Add InputX
+                  Store Result
+                  Load InputY
+                  Subt One
+                  Store InputY
+                  Skipcond 400 / have we completed the multiplication?
+                  Jump loop / no; repeat loop
+                  / yes, so exit the loop
+                 / check for negative flag, if it is set, negate the result
+                  Load negflag
+                  Skipcond 800
+                  Jump multResultNonNeg
+
+                  / negate result
+                  Load Result
+                  Subt Result
+                  Subt Result
+                  Store Result
+multResultNonNeg, JumpI MultiplyNumbers
+
+// division subroutine
+DivideNumbers, DEC 0
+CLEAR
+Store Result
+Store negflag
+/ negation is Load, Subt, Subt, Store
+Load InputY
+Skipcond 000
+Jump DivideLoop
+
+Subt InputY
+Subt InputY
+Store InputY
+Load negflag
+Add One
+Store negflag
+Subt 1
+SkipCond 400
+
+
+DivideLoop, Clear
+Load InputX
+Subt InputY
+Store InputX
+Load Result
+Add One
+Store Result
+Load InputX
+Subt InputY
+/ AC now holds InputX - InputY
+/ if AC > 0, continue loop
+/ if AC <= 0, exit loop
+Skipcond 000 / have we completed the division?
+Jump DivideLoop / no; repeat loop
+/ yes, so exit the loop
+JumpI DivideNumbers
+
+
+/ the constant 1
+One, DEC 1
+
+/ used to get the user menu input
+MenuChoice, DEC 0
+
+/ decimal representations of menu characters
+A, DEC 97
+S, DEC 115
+M, DEC 109
+D, DEC 100
+P, DEC 112
+InputX, DEC 0
+InputY, DEC 0
+Result, DEC 0
+negflag, DEC 0
