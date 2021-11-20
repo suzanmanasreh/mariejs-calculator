@@ -32,7 +32,7 @@ Jump DivideFunc
 
 / check 'p' for power/exponent
 NotD, Load MenuChoice
-Subt S
+Subt P
 Skipcond 400
 Jump NotP
 Jump PowerFunc
@@ -75,7 +75,15 @@ DivideFunc, INPUT
             Load Result
             Output
             Jump Menu
-PowerFunc,halt
+PowerFunc, INPUT
+           Store InputX
+           Input
+           Store InputY
+           JnS Exp
+           Load Result
+           Output
+           Jump Menu
+
 / multiplication subroutine
 MultiplyNumbers, DEC 0
                  CLEAR
@@ -132,8 +140,6 @@ Store InputY
 Load negflag
 Add One
 Store negflag
-Subt 1
-SkipCond 400
 
 
 DivideLoop, Clear
@@ -153,9 +159,45 @@ Jump DivideLoop / no; repeat loop
 / yes, so exit the loop
 JumpI DivideNumbers
 
+Exp, DEC 0
+Clear
+Store Result
+Load InputY
+Skipcond 000
+Jump PowerMultiply
+JumpI Exp
+
+PowerMultiply, Load One
+Store Result
+Load InputX
+Store Base
+Load InputY
+Store Power
+PowerLoop, Load Result
+Store InputX
+Load Base
+Store InputY
+JnS MultiplyNumbers
+Load Power
+Subt One
+Store Power
+Skipcond 400
+Jump PowerLoop
+JumpI Exp
+
+
+
+
+
+
+
+
+
+
 
 / the constant 1
 One, DEC 1
+Zero, DEC 0
 
 / used to get the user menu input
 MenuChoice, DEC 0
@@ -170,3 +212,5 @@ InputX, DEC 0
 InputY, DEC 0
 Result, DEC 0
 negflag, DEC 0
+Base, DEC 0
+Power, DEC 0
