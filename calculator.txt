@@ -40,6 +40,7 @@ Jump PowerFunc
 NotP, halt
 
 / put math code here
+/ addition subroutine wrapper
 AddFunc, INPUT
          Store InputX
          INPUT
@@ -49,6 +50,7 @@ AddFunc, INPUT
          Add InputY
          Output
          Jump Menu
+/ subtraction subroutine wrapper
 SubtractFunc, INPUT
               Store InputX
               INPUT
@@ -58,7 +60,8 @@ SubtractFunc, INPUT
               Subt InputY
               Output
               Jump Menu
-/ multiply for menu              
+/ multiply for menu
+/ multiplication subroutine wrapper
 MultiplyFunc, INPUT
               Store InputX
               Input
@@ -67,6 +70,7 @@ MultiplyFunc, INPUT
               Load Result
               Output
               Jump Menu
+/ division subroutine wrapper
 DivideFunc, INPUT
             Store InputX
             Input
@@ -75,6 +79,7 @@ DivideFunc, INPUT
             Load Result
             Output
             Jump Menu
+/ power/exponent calculation subroutine wrapper
 PowerFunc, INPUT
            Store InputX
            Input
@@ -84,7 +89,7 @@ PowerFunc, INPUT
            Output
            Jump Menu
 
-/ multiplication subroutine
+/ multiplication function
 MultiplyNumbers, DEC 0
                  CLEAR
                  Store Result
@@ -103,6 +108,8 @@ MultiplyNumbers, DEC 0
 
 MultiplyYNonNeg,  Clear
                   Store negflag
+
+/ multiplication loop subroutine
 loop, Load Result
                   Add InputX
                   Store Result
@@ -124,7 +131,7 @@ loop, Load Result
                   Store Result
 multResultNonNeg, JumpI MultiplyNumbers
 
-// division subroutine
+// division calculation subroutine
 DivideNumbers, DEC 0
 CLEAR
 Store Result
@@ -132,7 +139,7 @@ Store negflag
 / negation is Load, Subt, Subt, Store
 Load InputY
 Skipcond 000
-Jump DivideLoop
+Jump checkX
 
 Subt InputY
 Subt InputY
@@ -141,7 +148,18 @@ Load negflag
 Add One
 Store negflag
 
+checkX, Load InputX
+Skipcond 000
+Jump DivideLoop
 
+Subt InputX
+Subt InputX
+Store InputX
+Load negflag
+Add One
+Store negflag
+
+/ loop for division calculation
 DivideLoop, Clear
 Load InputX
 Subt InputY
@@ -157,8 +175,19 @@ Subt InputY
 Skipcond 000 / have we completed the division?
 Jump DivideLoop / no; repeat loop
 / yes, so exit the loop
-JumpI DivideNumbers
+Load negflag
+Subt One
+Skipcond 400
+Jump divResultNonNeg
+Load Result
+Subt Result
+Subt Result
+Store Result
 
+divResultNonNeg, JumpI DivideNumbers
+
+
+/ exponent calculation subroutine
 Exp, DEC 0
 Clear
 Store Result
@@ -167,6 +196,7 @@ Skipcond 000
 Jump PowerMultiply
 JumpI Exp
 
+/ multiplication for exponent calculation subroutine
 PowerMultiply, Load One
 Store Result
 Load InputX
@@ -186,16 +216,7 @@ Jump PowerLoop
 JumpI Exp
 
 
-
-
-
-
-
-
-
-
-
-/ the constant 1
+/ the constant 1 and 0
 One, DEC 1
 Zero, DEC 0
 
