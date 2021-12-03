@@ -41,60 +41,78 @@ NotP, halt
 
 / put math code here
 / addition subroutine wrapper
+/ input x and y
 AddFunc, INPUT
          Store InputX
          INPUT
          Store InputY
-         / add
+         / add x and y, and then output
          Load InputX
          Add InputY
          Output
+         / jump back to menu
          Jump Menu
 / subtraction subroutine wrapper
+/ input x and y
 SubtractFunc, INPUT
               Store InputX
               INPUT
               Store InputY
-              / subtract
+              / subtract y from x and output
               Load InputX
               Subt InputY
               Output
+              / jump back to menu
               Jump Menu
 / multiply for menu
 / multiplication subroutine wrapper
+/ input x and y
 MultiplyFunc, INPUT
               Store InputX
               Input
               Store InputY
+              / jump to MultiplyNumbers subroutine
               JnS MultiplyNumbers
+              / get result and output it
               Load Result
               Output
+              / jump back to menu
               Jump Menu
 / division subroutine wrapper
+/ input x and y
 DivideFunc, INPUT
             Store InputX
             Input
             Store InputY
+            / jump to DivideNumbers subroutine
             JnS DivideNumbers
+            / load result and output it
             Load Result
             Output
+            / jump back to menu
             Jump Menu
 / power/exponent calculation subroutine wrapper
+/ input x and y
 PowerFunc, INPUT
            Store InputX
            Input
            Store InputY
+           / jump to Exp subroutine
            JnS Exp
+           / load result and output it
            Load Result
            Output
+           / jump back to menu
            Jump Menu
 
 / multiplication function
 MultiplyNumbers, DEC 0
                  CLEAR
                  Store Result
+                 / load y if it's negative, negate it, mark negflag as 1
                  Load InputY
                  Skipcond 000
+                 / if y is positive, jump to MultiplyYNonNeg subroutine
                  Jump MultiplyYNonNeg
 
                  Subt InputY
@@ -104,22 +122,24 @@ MultiplyNumbers, DEC 0
                  Add One
                  Store negflag
                  Clear
-                 Jump loop
+                 / jumpt to MultiplyLoop subroutine
+                 Jump MultiplyLoop
 
 MultiplyYNonNeg,  Clear
                   Store negflag
 
 / multiplication loop subroutine
-loop, Load Result
+MultiplyLoop, Load Result
                   Add InputX
                   Store Result
                   Load InputY
                   Subt One
                   Store InputY
                   Skipcond 400 / have we completed the multiplication?
-                  Jump loop / no; repeat loop
+                  Jump MultiplyLoop / no; repeat loop
                   / yes, so exit the loop
                  / check for negative flag, if it is set, negate the result
+                  / load negative flag, and if it's negative, jump to multResultNonNeg subroutine
                   Load negflag
                   Skipcond 800
                   Jump multResultNonNeg
@@ -129,6 +149,7 @@ loop, Load Result
                   Subt Result
                   Subt Result
                   Store Result
+                  / jump back to multiplication wrapper
 multResultNonNeg, JumpI MultiplyNumbers
 
 // division calculation subroutine
@@ -137,8 +158,10 @@ CLEAR
 Store Result
 Store negflag
 / negation is Load, Subt, Subt, Store
+/ load y and if it's negative negate it
 Load InputY
 Skipcond 000
+/ if y not negative, jump to checkX subroutine
 Jump checkX
 
 Subt InputY
@@ -148,6 +171,8 @@ Load negflag
 Add One
 Store negflag
 
+/ load x and if it's not negative, jump to DivideLoop
+/ negate x and set negative flag
 checkX, Load InputX
 Skipcond 000
 Jump DivideLoop
@@ -160,6 +185,7 @@ Add One
 Store negflag
 
 / loop for division calculation
+/ repeatedly subtracting y from x while (x - y)>=0
 DivideLoop, Clear
 Load InputX
 Subt InputY
@@ -175,6 +201,7 @@ Subt InputY
 Skipcond 000 / have we completed the division?
 Jump DivideLoop / no; repeat loop
 / yes, so exit the loop
+/ if negative flag is 1, negate result, else jump to divResultNonNeg subroutine
 Load negflag
 Subt One
 Skipcond 400
@@ -184,6 +211,7 @@ Subt Result
 Subt Result
 Store Result
 
+/ jump back to DivideNumbers
 divResultNonNeg, JumpI DivideNumbers
 
 
@@ -191,18 +219,22 @@ divResultNonNeg, JumpI DivideNumbers
 Exp, DEC 0
 Clear
 Store Result
+/ load y, if y < 0, jump back to Exp
 Load InputY
 Skipcond 000
+/ if y > 0, jump to Power Multiply
 Jump PowerMultiply
 JumpI Exp
 
 / multiplication for exponent calculation subroutine
+/ store X as base and Y as power 
 PowerMultiply, Load One
 Store Result
 Load InputX
 Store Base
 Load InputY
 Store Power
+/ multiply x by itself as long as y > 0
 PowerLoop, Load Result
 Store InputX
 Load Base
@@ -211,6 +243,7 @@ JnS MultiplyNumbers
 Load Power
 Subt One
 Store Power
+/ if exponent = 0, get out of loop, else repeat
 Skipcond 400
 Jump PowerLoop
 JumpI Exp
@@ -229,9 +262,11 @@ S, DEC 115
 M, DEC 109
 D, DEC 100
 P, DEC 112
+/ input, result, and negative flag variables
 InputX, DEC 0
 InputY, DEC 0
 Result, DEC 0
 negflag, DEC 0
+/ variables for exponent subroutine
 Base, DEC 0
 Power, DEC 0
